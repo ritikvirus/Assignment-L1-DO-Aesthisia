@@ -6,6 +6,7 @@ Run the docker image on port 3000 & check the output on 'http://localhost:3000'
 # Let's Start
 ### I'm using AWS Instance ubuntu 22.04
 ## Follow These steps
+Make sure In Your Instance In pc port 3000 opened
 ```bash
 sudo apt update -y && sudo apt upgrade -y
 ```
@@ -44,4 +45,35 @@ cd ..
 ```bash
 cd aesthisia-demo
 ```
+### make Docker file inside 
+```bash
+vim Dockerfile
+```
+Write Docker File & You Can also paste these code  
+
+```bash
+FROM node:16
+WORKDIR /aesthisia-demo
+COPY package.json .
+RUN npm install
+COPY . .
+EXPOSE 3000
+CMD ["npm","start"]
+
+```  
+![dockerfile](https://github.com/ritikvirus/Assignment-L1-DO-Aesthisia/blob/master/images/Dockerfile.PNG)  
+
+### build Docker File 
+```bash
+docker build -t react-img .
+```  
+![dockerbuild](https://github.com/ritikvirus/Assignment-L1-DO-Aesthisia/blob/master/images/buildimg.PNG)  
+
+```bash
+docker run -d -p 3000:3000 --name reactapp react-img
+```
+### enjoy 
+yourIP:3000
+
+
 
