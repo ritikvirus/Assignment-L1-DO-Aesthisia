@@ -43,7 +43,7 @@ stage('Build and Push Docker image') {
                             export DOCKER_PASSWORD=\$(docker-credential-jenkins get ${DOCKER_REGISTRY} | jq -r '.Secret')
                             docker login -u \$DOCKER_USERNAME -p \$DOCKER_PASSWORD
                             docker pull ${DOCKER_REGISTRY}/${IMAGE_NAME}:latest
-                            docker run -d -p $APP_PORT:$APP_PORT ${DOCKER_REGISTRY}/${IMAGE_NAME}:latest
+                            docker run -d -p 3000:3000 ${DOCKER_REGISTRY}/${IMAGE_NAME}:latest
                         EOF
                     '''
                 }
