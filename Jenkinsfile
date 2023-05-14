@@ -1,7 +1,7 @@
 pipeline {
     agent any
     environment {
-        DOCKER_REGISTRY = "ritikvirus"
+        DOCKER_REGISTRY = "ritikvirus/repodoc"
         IMAGE_NAME = "pipelinedockerimage"
         SSH_CREDENTIAL_ID = "SSH_CREDENTIALS"
         DOCKER_CREDENTIALS_ID = "Docker_Cred"
