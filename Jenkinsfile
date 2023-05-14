@@ -34,11 +34,12 @@ pipeline {
             }
         }
 
+
         stage('Deploy to server') {
             steps {
-                sshagent([SSH_CREDENTIAL_ID]) {
+                withCredentials([sshUserPrivateKey(credentialsId: SSH_CREDENTIAL_ID, keyFileVariable: 'SSH_KEY')]) {
                     sh '''
-                        ssh ubuntu@65.2.169.55 << EOF
+                        ssh -i $SSH_KEY ubuntu@65.2.169.55 << EOF
                             set +x
                             export DOCKER_USERNAME=\$(docker-credential-jenkins get ${DOCKER_REGISTRY} | jq -r '.Username')
                             export DOCKER_PASSWORD=\$(docker-credential-jenkins get ${DOCKER_REGISTRY} | jq -r '.Secret')
