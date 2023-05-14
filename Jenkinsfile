@@ -44,3 +44,4 @@ stage('Deploy to server') {
         }
     }
 }
+    }
