@@ -36,14 +36,9 @@ pipeline {
         stage('Deploy to server') {
             steps {
                 sshagent(credentials:['SSH_CREDENTIALS']){
-                    sh '''
-                        ssh -i $SSH_KEY ubuntu@65.2.169.55 << EOF
-                            set +x
-                            docker pull ${DOCKER_REGISTRY}/${IMAGE_NAME}:latest
-                            docker run -d -p $APP_PORT:$APP_PORT ${DOCKER_REGISTRY}/${IMAGE_NAME}:latest
-                        EOF
-                    '''
+                    sh 'ssh  -o StrictHostKeyChecking=no  root@135.181.203.3 uptime "whoami"'
                 }
+                    echo "success lgoin"
             }
         }
     }
