@@ -30,21 +30,21 @@ pipeline {
         }
     }
 
-      stages{
-            stage('Deploy to server') {
-                steps{
-                sshagent([SSH_CREDENTIALS]) {
-            sh '''
-                ssh ubuntu@65.2.169.55 << EOF
-                    set +x
-                    export DOCKER_USERNAME=\$(docker-credential-jenkins get ${DOCKER_REGISTRY} | jq -r '.Username')
-                    export DOCKER_PASSWORD=\$(docker-credential-jenkins get ${DOCKER_REGISTRY} | jq -r '.Secret')
-                    docker login -u \$DOCKER_USERNAME -p \$DOCKER_PASSWORD
-                    docker pull ${DOCKER_REGISTRY}/${IMAGE_NAME}:$BUILD_NUMBER
-                    docker run -d -p $APP_PORT:$APP_PORT ${DOCKER_REGISTRY}/${IMAGE_NAME}:$BUILD_NUMBER
-                EOF
-            '''
-        }
+        stage('Deploy to server') {
+            steps {
+                sshagent([SSH_CREDENTIAL_ID]) {
+                    sh '''
+                        ssh ubuntu@65.2.169.55 << EOF
+                            set +x
+                            export DOCKER_USERNAME=\$(docker-credential-jenkins get ${DOCKER_REGISTRY} | jq -r '.Username')
+                            export DOCKER_PASSWORD=\$(docker-credential-jenkins get ${DOCKER_REGISTRY} | jq -r '.Secret')
+                            docker login -u \$DOCKER_USERNAME -p \$DOCKER_PASSWORD
+                            docker pull ${DOCKER_REGISTRY}/${IMAGE_NAME}:$BUILD_NUMBER
+                            docker run -d -p $APP_PORT:$APP_PORT ${DOCKER_REGISTRY}/${IMAGE_NAME}:$BUILD_NUMBER
+                        EOF
+                    '''
                 }
+            }
+        }
     }
 }
