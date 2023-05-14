@@ -28,7 +28,7 @@ pipeline {
             steps {
                 script {
                     docker.withRegistry('https://registry.hub.docker.com', DOCKER_CREDENTIALS_ID) {
-                        app = docker.push("${DOCKER_REGISTRY}/${IMAGE_NAME}:latest")
+                        docker push("${DOCKER_REGISTRY}/${IMAGE_NAME}:latest")
                     }
                 }
             }
