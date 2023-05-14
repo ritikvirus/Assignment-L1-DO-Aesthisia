@@ -7,6 +7,7 @@ pipeline {
         DOCKER_CREDENTIALS_ID = "Docker_Cred"
         APP_PORT = "3000"
     }
+    
     stages {
         stage('Clone repository') {
             steps {
@@ -17,7 +18,7 @@ pipeline {
         stage('Build Docker image') {
             steps {
                 script {
-                    app = sudo docker.build("${DOCKER_REGISTRY}/${IMAGE_NAME}:$BUILD_NUMBER")
+                    app = docker.build("${DOCKER_REGISTRY}/${IMAGE_NAME}:$BUILD_NUMBER")
                 }
             }
         }
@@ -25,7 +26,7 @@ pipeline {
         stage('Push Docker image') {
             steps {
                 script {
-                    sudo docker.withRegistry('https://registry.hub.docker.com', DOCKER_CREDENTIALS_ID) {
+                    docker.withRegistry('https://registry.hub.docker.com', DOCKER_CREDENTIALS_ID) {
                         app.push("$BUILD_NUMBER")
                     }
                 }
@@ -36,13 +37,13 @@ pipeline {
             steps {
                 sshagent([SSH_CREDENTIAL_ID]) {
                     sh '''
-                        sudo ssh ubuntu@65.2.169.55 << EOF
+                        ssh ubuntu@65.2.169.55 << EOF
                             set +x
-                            sudo export DOCKER_USERNAME=\$(docker-credential-jenkins get ${DOCKER_REGISTRY} | jq -r '.Username')
-                            sudo export DOCKER_PASSWORD=\$(docker-credential-jenkins get ${DOCKER_REGISTRY} | jq -r '.Secret')
-                            sudo docker login -u \$DOCKER_USERNAME -p \$DOCKER_PASSWORD
-                            sudo docker pull ${DOCKER_REGISTRY}/${IMAGE_NAME}:$BUILD_NUMBER
-                            sudo docker run -d -p $APP_PORT:$APP_PORT ${DOCKER_REGISTRY}/${IMAGE_NAME}:$BUILD_NUMBER
+                            export DOCKER_USERNAME=\$(docker-credential-jenkins get ${DOCKER_REGISTRY} | jq -r '.Username')
+                            export DOCKER_PASSWORD=\$(docker-credential-jenkins get ${DOCKER_REGISTRY} | jq -r '.Secret')
+                            docker login -u \$DOCKER_USERNAME -p \$DOCKER_PASSWORD
+                            docker pull ${DOCKER_REGISTRY}/${IMAGE_NAME}:$BUILD_NUMBER
+                            docker run -d -p $APP_PORT:$APP_PORT ${DOCKER_REGISTRY}/${IMAGE_NAME}:$BUILD_NUMBER
                         EOF
                     '''
                 }
@@ -50,3 +51,4 @@ pipeline {
         }
     }
 }
+    
