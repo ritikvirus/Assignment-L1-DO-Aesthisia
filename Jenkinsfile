@@ -39,7 +39,7 @@ pipeline {
             steps {
                 sshagent(['SSH_CREDENTIALS']) {
                     sh '''
-                        chmod 600 ${PEM_KEY_PATH}
+                    
                         ssh -i ${PEM_KEY_PATH} ubuntu@65.2.169.55 << EOF
                             set +x
                             export DOCKER_USERNAME=\$(docker-credential-jenkins get ${DOCKER_REGISTRY} | jq -r '.Username')
