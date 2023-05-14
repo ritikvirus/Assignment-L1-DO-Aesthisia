@@ -33,6 +33,15 @@ pipeline {
             }
         }
 
+        
+stage('Deploy to SSHserver') {
+    steps {
+        sshagent(credentials:['SSH_CREDENTIALS']) {
+            sh 'ssh  -o StrictHostKeyChecking=no  ubuntu@65.2.169.55 uptime "whoami"'
+        }
+    }
+}
+ 
         stage('Deploy to server') {
             steps {
                 sshagent(credentials:['SSH_CREDENTIALS']){
