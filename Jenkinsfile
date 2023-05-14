@@ -7,6 +7,7 @@ pipeline {
         DOCKER_CREDENTIAL_ID = "Docker_Cred"
         APP_PORT = "3000"
     }
+}
 
 pipeline {
     agent any
