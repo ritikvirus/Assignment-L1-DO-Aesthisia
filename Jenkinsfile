@@ -16,24 +16,21 @@ pipeline {
             }
         }
 
-        stage('Build Docker image') {
+        stage('Build and Push Docker image') {
             steps {
                 script {
-                    app = docker.build("${DOCKER_REGISTRY}/${IMAGE_NAME}:latest")
-                }
-            }
-        }
+                    def imageTag = "${DOCKER_REGISTRY}/${IMAGE_NAME}:latest"
+                    
+                    // Build Docker image
+                    docker.build(imageTag).push()
 
-        stage('Push Docker image') {
-            steps {
-                script {
+                    // Push Docker image to Docker Hub
                     docker.withRegistry('https://registry.hub.docker.com', DOCKER_CREDENTIALS_ID) {
-                        docker push("${DOCKER_REGISTRY}/${IMAGE_NAME}:latest")
+                        docker.image(imageTag).push()
                     }
                 }
             }
         }
-
         
       stage('Deploy to server') {
             steps {
