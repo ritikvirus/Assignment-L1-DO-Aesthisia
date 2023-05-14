@@ -8,6 +8,15 @@ pipeline {
         APP_PORT = "3000"
     }
 
+pipeline {
+    agent any
+    environment {
+        DOCKER_REGISTRY = "ritikvirus/pipeline_docker"
+        IMAGE_NAME = "pipelinedockerimage"
+        SSH_CREDENTIAL_ID = "SSH_CREDENTIALS"
+        DOCKER_CREDENTIALS_ID = "Docker_Cred"
+        APP_PORT = "3000"
+    }
     stages {
         stage('Clone repository') {
             steps {
@@ -15,20 +24,23 @@ pipeline {
             }
         }
 
-    stages{
         stage('Build Docker image') {
-            steps { 
-                docker.build("${DOCKER_REGISTRY}/${IMAGE_NAME}:$BUILD_NUMBER")
-    }
+            steps {
+                script {
+                    app = docker.build("${DOCKER_REGISTRY}/${IMAGE_NAME}:$BUILD_NUMBER")
+                }
+            }
         }
 
-     stages{
-            stage('Push Docker image') {
-                steps{ docker.withRegistry('https://registry.hub.docker.com', DOCKER_CREDENTIAL_ID) {
-            app.push("$BUILD_NUMBER")
+        stage('Push Docker image') {
+            steps {
+                script {
+                    docker.withRegistry('https://registry.hub.docker.com', DOCKER_CREDENTIALS_ID) {
+                        app.push("$BUILD_NUMBER")
+                    }
                 }
+            }
         }
-    }
 
         stage('Deploy to server') {
             steps {
