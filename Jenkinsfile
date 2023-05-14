@@ -6,6 +6,7 @@ pipeline {
         SSH_CREDENTIAL_ID = "SSH_CREDENTIALS"
         DOCKER_CREDENTIALS_ID = "Docker_Cred"
         APP_PORT = "3000"
+        PEM_KEY_PATH = "/home/ubuntu/jenkins1.pem"
     }
     
     stages {
@@ -34,20 +35,20 @@ pipeline {
         }
 
         
-        stage('Deploy to SSH server') {
+      stage('Deploy to server') {
             steps {
-                sshagent(credentials:['SSH_CREDENTIALS']) {
-                    sh 'ssh ubuntu@65.2.169.55 uptime whoami'
-                }
-            }
-        }
-
-        stage('Deploy to server') {
-            steps {
-                if (sh 'ssh ubuntu@65.2.169.55 uptime whoami') {
-                    echo "success login"
-                } else {
-                    fail("Failed to login to remote server")
+                sshagent(['SSH_CREDENTIALS']) {
+                    sh '''
+                        chmod 600 ${PEM_KEY_PATH}
+                        ssh -i ${PEM_KEY_PATH} ubuntu@65.2.169.55 << EOF
+                            set +x
+                            export DOCKER_USERNAME=\$(docker-credential-jenkins get ${DOCKER_REGISTRY} | jq -r '.Username')
+                            export DOCKER_PASSWORD=\$(docker-credential-jenkins get ${DOCKER_REGISTRY} | jq -r '.Secret')
+                            docker login -u \$DOCKER_USERNAME -p \$DOCKER_PASSWORD
+                            docker pull ${DOCKER_REGISTRY}/${IMAGE_NAME}:latest
+                            docker run -d -p $APP_PORT:$APP_PORT ${DOCKER_REGISTRY}/${IMAGE_NAME}:latest
+                        EOF
+                    '''
                 }
             }
         }
