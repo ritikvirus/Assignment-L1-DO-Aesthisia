@@ -36,7 +36,7 @@ pipeline {
         stage('Deploy to server') {
             steps {
                 sshagent(credentials:['SSH_CREDENTIALS']){
-                    sh 'ssh  -o StrictHostKeyChecking=no  root@135.181.203.3 uptime "whoami"'
+                    sh 'ssh  -o StrictHostKeyChecking=no  ubuntu@65.2.169.55 uptime "whoami"'
                 }
                     echo "success lgoin"
             }
