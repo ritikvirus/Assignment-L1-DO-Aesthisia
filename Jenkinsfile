@@ -18,7 +18,7 @@ pipeline {
         stage('Build Docker image') {
             steps {
                 script {
-                    app = docker.build("${DOCKER_REGISTRY}/${IMAGE_NAME}:latest$BUILD_NUMBER")
+                    app = docker.build("${DOCKER_REGISTRY}/${IMAGE_NAME}:latest")
                 }
             }
         }
@@ -27,8 +27,8 @@ pipeline {
             steps {
                 script {
                     docker.withRegistry('https://registry.hub.docker.com', DOCKER_CREDENTIALS_ID) {
-                         
-                         docker push ${DOCKER_REGISTRY}/${IMAGE_NAME}:latest${BUILD_NUMBER}
+                    app = docker.build("${DOCKER_REGISTRY}/${IMAGE_NAME}:latest")
+                        
                     }
                 }
             }
@@ -43,8 +43,8 @@ pipeline {
                             export DOCKER_USERNAME=\$(docker-credential-jenkins get ${DOCKER_REGISTRY} | jq -r '.Username')
                             export DOCKER_PASSWORD=\$(docker-credential-jenkins get ${DOCKER_REGISTRY} | jq -r '.Secret')
                             docker login -u \$DOCKER_USERNAME -p \$DOCKER_PASSWORD
-                            docker pull ${DOCKER_REGISTRY}/${IMAGE_NAME}:latest$BUILD_NUMBER
-                            docker run -d -p $APP_PORT:$APP_PORT ${DOCKER_REGISTRY}/${IMAGE_NAME}:latest$BUILD_NUMBER
+                            docker pull ${DOCKER_REGISTRY}/${IMAGE_NAME}:latest
+                            docker run -d -p $APP_PORT:$APP_PORT ${DOCKER_REGISTRY}/${IMAGE_NAME}:latest
                         EOF
                     '''
                 }
