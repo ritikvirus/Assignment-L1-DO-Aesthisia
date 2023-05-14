@@ -37,14 +37,14 @@ pipeline {
         stage('Deploy to SSH server') {
             steps {
                 sshagent(credentials:['SSH_CREDENTIALS']) {
-                    sh 'ssh ubuntu@65.2.169.55 uptime "whoami"'
+                    sh 'ssh ubuntu@65.2.169.55 uptime whoami'
                 }
             }
         }
 
         stage('Deploy to server') {
             steps {
-                if (sh 'ssh ubuntu@65.2.169.55 uptime "whoami"') {
+                if (sh 'ssh ubuntu@65.2.169.55 uptime whoami') {
                     echo "success login"
                 } else {
                     fail("Failed to login to remote server")
