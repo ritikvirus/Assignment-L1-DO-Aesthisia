@@ -58,14 +58,14 @@ stage('Build and Push Docker image') {
             steps {
                 sshagent(['SSH_CREDENTIALS']) {
                     sh '''
-                        ssh -i ${PEM_KEY_PATH} ubuntu@65.2.169.55 << EOF
+                        ssh -i ${PEM_KEY_PATH} ubuntu@65.2.169.55 <<EOF
                             set +x
                             export DOCKER_USERNAME=\$(docker-credential-jenkins get ${DOCKER_REGISTRY} | jq -r '.Username')
                             export DOCKER_PASSWORD=\$(docker-credential-jenkins get ${DOCKER_REGISTRY} | jq -r '.Secret')
                             echo \$DOCKER_PASSWORD | docker login -u \$DOCKER_USERNAME --password-stdin
                             docker pull ${DOCKER_REGISTRY}/${IMAGE_NAME}:latest
                             docker run -d -p 3000:3000 ${DOCKER_REGISTRY}/${IMAGE_NAME}:latest
-                        << EOF
+                        <<EOF
                     '''
                 }
             }
