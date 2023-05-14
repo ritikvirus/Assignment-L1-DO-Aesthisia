@@ -1,4 +1,5 @@
-node {
+pipeline {
+    agent any
     environment {
         DOCKER_REGISTRY = "ritikvirus/pipeline_docker"
         IMAGE_NAME = "pipelinedockerimage"
@@ -6,24 +7,33 @@ node {
         DOCKER_CREDENTIAL_ID = "Docker_Cred"
         APP_PORT = "3000"
     }
-    def app 
 
-    stage('Clone repository') {
-        checkout scm
+    stages {
+        stage('Clone repository') {
+            steps {
+                checkout scm
+            }
+        }
+
+    stages{
+        stage('Build Docker image') {
+            steps { 
+                docker.build("${DOCKER_REGISTRY}/${IMAGE_NAME}:$BUILD_NUMBER")
     }
+        }
 
-    stage('Build Docker image') {
-        app = docker.build("${DOCKER_REGISTRY}/${IMAGE_NAME}:$BUILD_NUMBER")
-    }
-
-    stage('Push Docker image') {
-        docker.withRegistry('https://registry.hub.docker.com', DOCKER_CREDENTIAL_ID) {
+     stages{
+            stage('Push Docker image') {
+                steps{ docker.withRegistry('https://registry.hub.docker.com', DOCKER_CREDENTIAL_ID) {
             app.push("$BUILD_NUMBER")
+                }
         }
     }
 
-    stage('Deploy to server') {
-        sshagent([SSH_CREDENTIALS]) {
+      stages{
+            stage('Deploy to server') {
+                steps{
+                sshagent([SSH_CREDENTIALS]) {
             sh '''
                 ssh ubuntu@65.2.169.55 << EOF
                     set +x
@@ -35,5 +45,6 @@ node {
                 EOF
             '''
         }
+                }
     }
 }
