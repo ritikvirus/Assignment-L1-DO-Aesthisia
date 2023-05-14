@@ -32,6 +32,7 @@ stage('Build and Push Docker image') {
     }
 }
         
+        
         stage('Deploy to server') {
             steps {
                 sshagent(['SSH_CREDENTIALS']) {
