@@ -33,15 +33,22 @@ stage('Build and Push Docker image') {
 }
         
         
-stage('Deploy to server') {
-    steps {
-        sshagent(['SSH_CREDENTIALS']) {
-            withCredentials([usernamePassword(credentialsId: 'DOCKER_CREDENTIALS_ID', usernameVariable: 'DOCKER_USERNAME', passwordVariable: 'DOCKER_PASSWORD')]) {
-                sh '''
-                    ssh -i ${PEM_KEY_PATH} ubuntu@65.2.169.55 "set +x && echo \$DOCKER_PASSWORD | docker login -u \$DOCKER_USERNAME --password-stdin && docker pull ${DOCKER_REGISTRY}/${IMAGE_NAME}:latest && docker run -d -p 3000:3000 ${DOCKER_REGISTRY}/${IMAGE_NAME}:latest"
-                '''
+      stage('Deploy to server') {
+            steps {
+                sshagent(['SSH_CREDENTIALS']) {
+                    sh '''
+                    
+                        ssh -i ${PEM_KEY_PATH} ubuntu@65.2.169.55 << EOF
+                            set +x
+                            export DOCKER_USERNAME=\$(docker-credential-jenkins get ${DOCKER_REGISTRY} | jq -r '.Username')
+                            export DOCKER_PASSWORD=\$(docker-credential-jenkins get ${DOCKER_REGISTRY} | jq -r '.Secret')
+                            docker login -u \$DOCKER_USERNAME -p \$DOCKER_PASSWORD
+                            docker pull ${DOCKER_REGISTRY}/${IMAGE_NAME}:latest
+                            docker run -d -p 3000:3000 ${DOCKER_REGISTRY}/${IMAGE_NAME}:latest
+                        EOF
+                    '''
+                }
             }
         }
     }
 }
-    }
