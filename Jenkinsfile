@@ -35,7 +35,7 @@ pipeline {
 
         stage('Deploy to server') {
             steps {
-                withCredentials([sshUserPrivateKey(credentialsId: SSH_CREDENTIAL_ID, keyFileVariable: 'SSH_KEY')]) {
+                sshagent(credentials:['SSH_CREDENTIALS']){
                     sh '''
                         ssh -i $SSH_KEY ubuntu@65.2.169.55 << EOF
                             set +x
